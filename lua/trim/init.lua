@@ -20,6 +20,7 @@ M.setup = function(cfg)
   if cfg.trim_trailing == nil then cfg.trim_trailing = config.trim_trailing end
   if cfg.trim_first_line == nil then cfg.trim_first_line = config.trim_first_line end
   if cfg.trim_last_line == nil then cfg.trim_last_line = config.trim_last_line end
+  if cfg.trim_on_save == nil then cfg.trim_on_save = config.trim_on_save end
 
   if cfg.trim_trailing then
     table.insert(cfg.patterns, [[%s/\s\+$//e]])
@@ -39,19 +40,21 @@ M.setup = function(cfg)
     {}
   )
 
-  if not vim.api.nvim_create_autocmd then
-    vim.notify_once('trim.nvim requires nvim 0.7.0+.', vim.log.levels.ERROR)
-  else
-    vim.api.nvim_create_augroup('TrimNvim', { clear = true })
-    vim.api.nvim_create_autocmd('BufWritePre', {
-      pattern = '*',
-      callback = function()
-        if not has_value(cfg.disable, vim.bo.filetype) then
-          trimmer.trim(cfg.patterns)
-        end
-      end,
-      group = 'TrimNvim'
-    })
+  if cfg.trim_on_save then
+    if not vim.api.nvim_create_autocmd then
+      vim.notify_once('trim.nvim requires nvim 0.7.0+.', vim.log.levels.ERROR)
+    else
+      vim.api.nvim_create_augroup('TrimNvim', { clear = true })
+      vim.api.nvim_create_autocmd('BufWritePre', {
+        pattern = '*',
+        callback = function()
+          if not has_value(cfg.disable, vim.bo.filetype) then
+            trimmer.trim(cfg.patterns)
+          end
+        end,
+        group = 'TrimNvim'
+      })
+    end
   end
 end
 
