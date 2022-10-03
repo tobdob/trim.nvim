@@ -31,6 +31,14 @@ M.setup = function(cfg)
     table.insert(cfg.patterns, [[%s/\%^\n\+//]])
   end
 
+  vim.api.nvim_create_user_command(
+    'Trim',
+    function()
+      trimmer.trim(cfg.patterns)
+    end,
+    {}
+  )
+
   if not vim.api.nvim_create_autocmd then
     vim.notify_once('trim.nvim requires nvim 0.7.0+.', vim.log.levels.ERROR)
   else
